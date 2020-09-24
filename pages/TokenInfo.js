@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, StyleSheet, Text, Image } from 'react-native';
-import axios from 'axios'; 
 import { AreaChart } from 'react-native-svg-charts';
 import {
     Defs,
@@ -12,38 +11,42 @@ import * as shape from 'd3-shape';
 import Icon from 'react-native-vector-icons/dist/EvilIcons';
 
 import { AppContext } from '../providers/AppProvider';
-import config from '../config';
+import {rootUrl} from '../config';
 import TimeControls from '../components/TimeControls';
+import Loader from '../components/Loader';
+import axios from 'axios';
 
-class TokenInfo extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            tokenRate: [], 
-            tokenData: [],
-            currentTokenRate: 0,
-            percentage: 0,
-            graphData: []
-        };
-    }
+const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
+    const [tokenRate, setTokenRate] = useState([]);
+    const [tokenData, setTokenData] = useState([]);
+    const [currentTokenRate, setCurrentTokenRate] = useState(0);
+    const [percentage, setPercentage] = useState(0);
+    const [graphData, setGraphData] = useState([]);
+    const [gradient, setGradient] = useState([]);
+    const [tokenRateLoaded, setTokenRateLoaded] = useState(false);
+    const [tokenDataLoaded, setTokenDataLoaded] = useState(false);
+    const [error, setError] = useState(false);
 
-    componentDidMount () {
-        this.getTokenData();
-    }
+    useEffect(() => {
+        getTokenData();
+    }, []);
 
-    componentDidUpdate () {
-        if (this.props.featchData) {
-            this.getTokenData();
-            this.props.dataFeatched();
+    useEffect(() => {
+        if (featchData) {
+            dataFeatched();
+            getTokenData();
         }
-    }
+    });
 
     getTokenData = () => {
-        axios.get(`${config.rootUrl}/asset/id/${this.props.tokenId}`).then(res => {
-            this.setState({tokenData: res.data});
-        }).catch(err => {console.log(err);});
+        axios.get(`${rootUrl}/asset/id/${tokenId}`).then(res => {
+            setTokenData(res.data);
+            setTokenDataLoaded(true);
+        }).catch(err => {
+            setError(true);
+        });
 
-        axios.get(`${config.rootUrl}/asset/id/${this.props.tokenId}/rate?fiat=NZD&period=${this.props.period}&type=historic&has_history_only=true`).then(res => {
+        axios.get(`${rootUrl}/asset/id/${tokenId}/rate?fiat=NZD&period=${period}&type=historic&has_history_only=true`).then(res => {
             let graphData = [];
             let max = 0;
             let min = Infinity;
@@ -57,27 +60,29 @@ class TokenInfo extends React.Component {
                     min = res.data.history[i].rate;
                 }
             }
-            this.setState({
-                tokenRate: res.data, 
-                graphData: graphData, 
-                currentTokenRate: res.data.history[0].rate - res.data.rate,
-                percentage: (res.data.history[0].rate - res.data.rate) / res.data.rate * 100,
-                gradient: 100 - (min/max) * 100
-            });
-        }).catch(err => {console.log(err);});
+            setTokenRate(res.data);
+            setGraphData(graphData);
+            setCurrentTokenRate(res.data.history[0].rate - res.data.rate);
+            setPercentage((res.data.history[0].rate - res.data.rate) / res.data.rate * 100);
+            setGradient(100 - (min/max) * 100);
+            setTokenRateLoaded(true);
+        }).catch(err => {
+            setError(true);
+        });
     }
 
-    render () {
-        const Line = ({ line }) => (
-            <Path
-                key={'line'}
-                d={line}
-                stroke={'#F15A29'}
-                fill={'none'}
-                strokeWidth={'2'}
-                strokeOpacity={'0.6'}
-            />
-        )
+    const Line = ({ line }) => (
+        <Path
+            key={'line'}
+            d={line}
+            stroke={'#F15A29'}
+            fill={'none'}
+            strokeWidth={'2'}
+            strokeOpacity={'0.6'}
+        />
+    )
+
+    if (tokenDataLoaded && tokenRateLoaded) {
         return (
             <AppContext.Consumer>
                 {(context) => (
@@ -87,28 +92,28 @@ class TokenInfo extends React.Component {
                                 size={60} style={[styles.icon, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]} 
                                 onPress={() => context.changePage(false)}/>
                             <View style={styles.headerInfo}>
-                                <Image style={styles.symbol} source={{uri: (context.state.darkTheme) ? this.state.tokenData.icon_address_dark : this.state.tokenData.icon_address}}/>
+                                <Image style={styles.symbol} source={{uri: (context.state.darkTheme) ? tokenData.icon_address_dark : tokenData.icon_address}}/>
                                 <Text style={[styles.name, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]} onPress={() => context.toggleTheme()}>
-                                    {this.state.tokenData.name}
+                                    {tokenData.name}
                                 </Text>
                             </View>
                         </View>
-
-                        <TimeControls updatePeriod={context.updatePeriod} period={this.props.period} darkTheme={context.state.darkTheme}/>
-
+    
+                        <TimeControls updatePeriod={context.updatePeriod} period={context.state.period} darkTheme={context.state.darkTheme}/>
+    
                         <View style={[styles.graphContainer, {borderColor: (context.state.darkTheme) ? '#161616' : '#F6F6F6'}]}>
                             <View style={styles.tokenInfo}>
                                 <Text style={[styles.rate, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]}>
-                                    {`$${Number(this.state.tokenRate.rate).toFixed(4)}`}
+                                    {`$${Number(tokenRate.rate).toFixed(4)}`}
                                 </Text>
                                 <Text style={styles.percentage}>
-                                    {`${Number(this.state.percentage).toFixed(2)}% ($${Number(this.state.currentTokenRate).toFixed(20).match(/^-?\d*\.?0*\d{0,2}/)[0]})`}
+                                    {`${Number(percentage).toFixed(2)}% ($${Number(currentTokenRate).toFixed(20).match(/^-?\d*\.?0*\d{0,2}/)[0]})`}
                                 </Text>
                             </View>
-
+    
                             <AreaChart
                                 style={styles.graph}
-                                data={ this.state.graphData }
+                                data={ graphData }
                                 contentInset={ { top: 0, bottom: 20 } }
                                 curve={shape.curveNatural}
                                 svg={{
@@ -122,13 +127,13 @@ class TokenInfo extends React.Component {
                                 }}>
                                 {context.state.darkTheme
                                 ?<Defs key={'gradient'} style={styles.linearGradient}>
-                                    <LinearGradient id={'gradient'} x1='0%' y1={this.state.gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse" style={styles.linearGradient}>
+                                    <LinearGradient id={'gradient'} x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse" style={styles.linearGradient}>
                                         <Stop offset="100%" stopColor="#F15A29" stopOpacity="0.2" />
                                         <Stop offset="0%" stopColor="#000000" stopOpacity="1" />
                                     </LinearGradient>
                                 </Defs>
                                 :<Defs key={'gradient'}>
-                                    <LinearGradient id={'gradient'} x1='0%' y1={this.state.gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse" style={styles.linearGradient}>
+                                    <LinearGradient id={'gradient'} x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse" style={styles.linearGradient}>
                                         <Stop offset="100%" stopColor="#F15A29" stopOpacity="0.2" />
                                         <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
                                     </LinearGradient>
@@ -137,7 +142,7 @@ class TokenInfo extends React.Component {
                                 <Line/>
                             </AreaChart>
                         </View>
-
+    
                         <View style={styles.tokenContainer}>
                             <Text style={[styles.infomation, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]}>
                                 Information
@@ -154,16 +159,16 @@ class TokenInfo extends React.Component {
                                         24h Volume:
                                     </Text>
                                 </View>
-
+    
                                 <View>
                                     <Text style={[styles.infomationData, {color: (context.state.darkTheme ? '#646464' : '#8A96AA')}]}>
-                                        {this.state.tokenData.symbol}
+                                        {tokenData.symbol}
                                     </Text>
                                     <Text style={[styles.infomationData, {color: (context.state.darkTheme ? '#646464' : '#8A96AA')}]}>
-                                        {`$${Number(this.state.tokenRate.market_cap).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${this.state.tokenRate.fiat_symbol}`}
+                                        {`$${Number(tokenRate.market_cap).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${tokenRate.fiat_symbol}`}
                                     </Text>
                                     <Text style={[styles.infomationData, {color: (context.state.darkTheme ? '#646464' : '#8A96AA')}]}>
-                                        {`$${Number(this.state.tokenRate.volume_24h).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${this.state.tokenRate.fiat_symbol}`}
+                                        {`$${Number(tokenRate.volume_24h).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${tokenRate.fiat_symbol}`}
                                     </Text>
                                 </View>
                             </View>
@@ -172,6 +177,8 @@ class TokenInfo extends React.Component {
                 )}
             </AppContext.Consumer>
         )
+    } else {
+        return <Loader/>
     }
 }
 

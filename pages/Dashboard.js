@@ -1,85 +1,82 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, StyleSheet, ScrollView, Text, TextInput } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/dist/EvilIcons';
 
 import {AppContext} from '../providers/AppProvider';
-import config from '../config';
+import {rootUrl} from '../config';
 import TrackerCard from '../components/TrackerCard';
 import TimeControls from '../components/TimeControls';
+import Loader from '../components/Loader';
 
-class Dashboard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { 
-            tokens: [],
-            q: '',
-            search: false
-        };
-    }
+const Dashboard = ({}) => {
+    const [tokens, setTokens] = useState([]);
+    const [q, setQ] = useState('');
+    const [search, setSearch] = useState(false);
+    const [tokensFeatched, setTokensFeatched] = useState(false);
+    const [error, setError] = useState(false);
 
-    componentDidMount () {
-        this.getTokens();
-    }
+    useEffect(() => {
+        getTokens();
+    }, []);
 
     getTokens = () => {
-        if (this.state.q.length > 0) {
-            axios.get(`${config.rootUrl}/all?take=50&blockchain=ethereum&search=${this.state.q}&has_history_only=true`).then(res => {
-                this.setState({tokens: res.data, featched: true});
-            }).catch(err => {console.log(err);});
+        let url = '';
+        if (q.length > 0) {
+            url = `${rootUrl}/all?take=50&blockchain=ethereum&search=${q}&has_history_only=true`;
         } else {
-            axios.get(config.rootUrl + '/all').then(res => {
-                this.setState({tokens: res.data, featched: true});
-            }).catch(err => {console.log(err);});
+            url = `${rootUrl}/all`;
         }
+
+        axios.get(url).then(res => {
+            setTokens(res.data);
+            setTokensFeatched(true);
+        }).catch(err => {setError(true)});
     }
 
-    onChangeText = (text) => {
-        this.setState({q:text});
-    }
-
-    toggleSearch = () => {
-        this.setState({search: !this.state.search});
-    }
-
-    render () {
+    if (tokensFeatched) {
         return (
             <AppContext.Consumer>
                 {(context) => (
                     <View style={styles.container}>
                         <View style={styles.header}>
-                            <View style={[styles.title, {display: (this.state.search) ? 'none' : 'flex'}]}>
+                            <View style={[styles.title, {display: (search) ? 'none' : 'flex'}]}>
                                 <Text style={[styles.text, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]} onPress={() => context.toggleTheme()}>
                                     Tracker
                                 </Text>
                             </View>
-                            <TextInput value={this.state.q}
+                            <TextInput value={q}
                                 style={[
                                     styles.searchBar, 
                                     {borderColor: (context.state.darkTheme) ? '#161616' : '#F6F6F6', 
-                                    display: (this.state.search) ? 'flex' : 'none', color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}
+                                    display: (search) ? 'flex' : 'none', color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}
                                 ]}
-                                onChangeText={text => this.onChangeText(text)}
-                                onSubmitEditing={() => this.getTokens()}
+                                onChangeText={text => setQ(text)}
+                                onSubmitEditing={() => getTokens()}
                             />
-                            <Icon name='search' size={30} style={[styles.icon, {color: (this.context.darkTheme) ? '#F6F6F6' : '#495162'}]} onPress={() => this.toggleSearch()}></Icon>
+                            <Icon name='search' size={30} style={[styles.icon, {color: (context.state.darkTheme) ? '#F6F6F6' : '#495162'}]} onPress={() => setSearch(!search)}></Icon>
                         </View>
-                        <TimeControls updatePeriod={context.updatePeriod} period={context.state.period} darkTheme={this.context.darkTheme}/>
+                        <TimeControls updatePeriod={context.updatePeriod} period={context.state.period} darkTheme={context.state.darkTheme}/>
                         <ScrollView style={styles.body}>
-                            {this.state.tokens.map((data, index) => {
-                                return <TrackerCard key={index} 
-                                index={index} data={data} 
-                                period={context.state.period}
-                                featchData={context.state.featchData}
-                                dataFeatched={context.dataFeatched}
-                                darkTheme={context.state.darkTheme} 
-                                changePage={context.changePage}/>
+                            {tokens.map((data, index) => {
+                                return <TrackerCard 
+                                    key={index} 
+                                    index={index} 
+                                    data={data} 
+                                    period={context.state.period}
+                                    featchData={context.state.featchData}
+                                    dataFeatched={context.dataFeatched}
+                                    darkTheme={context.state.darkTheme} 
+                                    changePage={context.changePage}
+                                    />
                             })}
                         </ScrollView>
                     </View>
                 )}
             </AppContext.Consumer>
         )
+    } else {
+        return <Loader/>
     }
 }
 

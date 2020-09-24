@@ -4,15 +4,12 @@ import axios from 'axios';
 import { LineChart } from 'react-native-svg-charts';
 import * as shape from 'd3-shape';
 
-
-import config from '../config';
-
+import {rootUrl} from '../config';
 
 class TrackerCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = { 
-            tokenData: [],
             tokenRate: [],
             currentTokenRate: 0,
             percentage: '',
@@ -38,11 +35,7 @@ class TrackerCard extends React.Component {
      }
 
     getTokenData = () => {
-        axios.get(`${config.rootUrl}/asset/id/${this.props.data.id}`).then(res => {
-            this._isMounted && this.setState({tokenData: res.data});
-        }).catch(err => {console.log(err);});
-
-        axios.get(`${config.rootUrl}/asset/id/${this.props.data.id}/rate?fiat=NZD&period=${this.props.period}&type=historic`).then(res => {
+        axios.get(`${rootUrl}/asset/id/${this.props.data.id}/rate?fiat=NZD&period=${this.props.period}&type=historic`).then(res => {
             let graphData = [];
             for (let i=0;i<res.data.history.length;i++) {
                 graphData.push(res.data.history[i].rate);

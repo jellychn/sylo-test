@@ -34,7 +34,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
         }
     });
 
-    getTokenData = () => {
+    getTokenData = async () => {
         axios.get(`${rootUrl}/asset/id/${tokenId}`).then(res => {
             setTokenData(res.data);
             setTokenDataLoaded(true);

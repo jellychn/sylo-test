@@ -15,6 +15,7 @@ class TrackerCard extends React.Component {
             currentTokenRate: 0,
             percentage: '',
             graphData: [],
+            error: false
         };
         this._isMounted = false;
     }
@@ -47,7 +48,7 @@ class TrackerCard extends React.Component {
                 currentTokenRate: res.data.history[0].rate - res.data.rate,
                 percentage: (res.data.history[0].rate - res.data.rate) / res.data.rate * 100
             });
-        }).catch(err => {console.log(err);});
+        }).catch(err => {this.setState({error:true})});
     }
 
     render () {
@@ -60,7 +61,9 @@ class TrackerCard extends React.Component {
 
                 <View style={styles.trackerInfo}>
                     <Image style={styles.symbol} source={{uri: (this.props.darkTheme) ? this.props.data.icon_address_dark : this.props.data.icon_address}}/>
-                    <Text style={[styles.name, {color: (this.props.darkTheme) ? '#F6F6F6' : '#495162'}]}>{this.props.data.name}</Text>
+                    <Text style={[styles.name, {color: (this.props.darkTheme) ? '#F6F6F6' : '#495162'}]}>
+                        {this.props.data.name}
+                    </Text>
                     <View style={styles.reateInfo}>
                         <Text style={[styles.rate, {color: (this.props.darkTheme) ? '#F6F6F6' : '#495162'}]}>
                             {`$${Number(this.state.tokenRate.rate).toFixed(4)}`}

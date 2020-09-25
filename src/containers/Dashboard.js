@@ -22,7 +22,7 @@ const Dashboard = ({}) => {
         getTokens();
     }, []);
 
-    getTokens = () => {
+    getTokens = async () => {
         let url = '';
         if (q.length > 0) {
             url = `${rootUrl}/all?take=50&blockchain=ethereum&search=${q}&has_history_only=true`;
@@ -54,7 +54,7 @@ const Dashboard = ({}) => {
                         <ScrollView style={styles.body}>
                             {tokens.map((data, index) => {
                                 return <TrackerCard 
-                                    key={index} 
+                                    key={data.id} 
                                     index={index} 
                                     data={data} 
                                     period={context.state.period}

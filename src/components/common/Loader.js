@@ -9,7 +9,7 @@ const Loader = () => {
         <AppContext.Consumer>
             {(context) => (
                 <View style={styles.container}>
-                    <Text style={[styles.loader, {color: context.state.darkTheme ? '#F15A29':'#000000'}]}>LOADING</Text>
+                    <Text style={[styles.loader, {color: context.state.darkTheme ? '#F15A29':'#8A96AA'}]}>LOADING</Text>
                 </View>
             )}
         </AppContext.Consumer>

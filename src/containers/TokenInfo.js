@@ -60,7 +60,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
             setGraphData(graphData);
             setCurrentTokenRate(res.data.history[0].rate - res.data.rate);
             setPercentage((res.data.history[0].rate - res.data.rate) / res.data.rate * 100);
-            setGradient(100 - (min/max) * 100);
+            setGradient((100 - (min/max) * 100) + ((100 - (min/max) * 100) * 0.1));
             setTokenRateLoaded(true);
         }).catch(err => {
             setError(true);

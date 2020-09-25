@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import {AppProvider, AppContext} from './providers/AppProvider';
 
-import Dashboard from './pages/Dashboard';
-import TokenInfo from './pages/TokenInfo';
+import Dashboard from './containers/Dashboard';
+import TokenInfo from './containers/TokenInfo';
 
 
 const App = () => {

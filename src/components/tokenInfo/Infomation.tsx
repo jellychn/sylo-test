@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import styles from '../../containers/TokenInfo.styles';
+import PropTypes from 'prop-types';
 
-const Infomation = ({darkTheme, tokenData, tokenRate}) => {
+type InfomationProps = {
+    darkTheme: boolean,
+    tokenData: any,
+    tokenRate: any
+}
+
+const Infomation = ({darkTheme, tokenData, tokenRate}: InfomationProps) => {
     return (
         <View style={styles.tokenContainer}>
             <Text style={[styles.infomation, {color: (darkTheme) ? '#F6F6F6' : '#495162'}]}>
@@ -38,3 +45,9 @@ const Infomation = ({darkTheme, tokenData, tokenRate}) => {
 }
 
 export default Infomation;
+
+Infomation.propTypes = {
+    darkTheme: PropTypes.bool.isRequired, 
+    tokenData: PropTypes.any.isRequired, 
+    tokenRate: PropTypes.any.isRequired
+}

@@ -4,9 +4,19 @@ import styles from '../../containers/TokenInfo.styles';
 import { AreaChart } from 'react-native-svg-charts';
 import { Defs, LinearGradient, Stop, Path } from 'react-native-svg';
 import * as shape from 'd3-shape';
+import PropTypes from 'prop-types';
 
-const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, percentage}) => {
-    const Line = ({ line }) => (
+type GraphProps = {
+    darkTheme: boolean,
+    tokenRate: any,
+    currentTokenRate: any,
+    graphData: any,
+    gradient: number,
+    percentage: number
+}
+
+const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, percentage}: GraphProps) => {
+    const Line = ({ line }: any) => (
         <Path
             key={'line'}
             d={line}
@@ -38,12 +48,11 @@ const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, per
                     strokeWidth: '0',
                     strokeLinejoin: 'round',
                     strokeLinecap: 'round',
-                    strokeLinejoin: 'round',
                     fill: "url(#gradient)",
                 }}>
 
-                <Defs key={'gradient'} style={styles.linearGradient}>
-                    <LinearGradient id={'gradient'} x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse" style={styles.linearGradient}>
+                <Defs key={'gradient'}>
+                    <LinearGradient id={'gradient'} x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse">
                         <Stop offset="100%" stopColor="#F15A29" stopOpacity="0.2" />
                         {darkTheme
                         ? <Stop offset="0%" stopColor="#000000" stopOpacity="1" />
@@ -58,3 +67,12 @@ const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, per
 }
 
 export default Graph;
+
+Graph.propTypes = {
+    darkTheme: PropTypes.bool.isRequired,
+    tokenRate: PropTypes.any.isRequired,
+    currentTokenRate: PropTypes.number.isRequired,
+    graphData: PropTypes.any.isRequired,
+    gradient: PropTypes.number.isRequired,
+    percentage: PropTypes.number.isRequired  
+}

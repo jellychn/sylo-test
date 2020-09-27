@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import styles from './TimeControls.styles';
+import PropTypes from 'prop-types';
 
-const TimeControls = ({darkTheme, period, updatePeriod}) => {
+type TimeControlsProps = {
+    darkTheme: boolean, 
+    period: string, 
+    updatePeriod: Function
+}
+
+const TimeControls = ({darkTheme, period, updatePeriod}: TimeControlsProps) => {
     const [times] = useState(['all', 'year', 'month', 'week','day']);
 
     const controls = times.map((time, index) => {
@@ -17,3 +24,9 @@ const TimeControls = ({darkTheme, period, updatePeriod}) => {
 }
 
 export default TimeControls;
+
+TimeControls.propTypes = {
+    darkTheme: PropTypes.bool.isRequired,
+    period: PropTypes.string.isRequired,
+    updatePeriod: PropTypes.func.isRequired
+};

@@ -2,8 +2,16 @@ import React from 'react';
 import { View, Image, Text } from 'react-native';
 import styles from '../../containers/TokenInfo.styles';
 import Icon from 'react-native-vector-icons/dist/EvilIcons';
+import PropTypes from 'prop-types';
 
-const header = ({darkTheme, changePage, tokenData, toggleTheme}) => {
+type HeaderProps = {
+    darkTheme: boolean,
+    changePage: Function,
+    tokenData: any,
+    toggleTheme: Function
+}
+
+const Header = ({darkTheme, changePage, tokenData, toggleTheme}: HeaderProps) => {
     return (
         <View style={styles.header}>
             <Icon name='chevron-left' 
@@ -20,4 +28,11 @@ const header = ({darkTheme, changePage, tokenData, toggleTheme}) => {
     )
 }
 
-export default header;
+export default Header;
+
+Header.protoTypes = {
+    darkTheme: PropTypes.bool.isRequired,
+    changePage: PropTypes.func.isRequired,
+    tokenData: PropTypes.any.isRequired,
+    toggleTheme: PropTypes.func.isRequired
+}

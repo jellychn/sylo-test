@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 import { AppContext } from '../providers/AppProvider';
 import {rootUrl} from '../utils/config';
+import {calculateTokenGraphValues} from '../utils/common-functions';
 
 import TimeControls from '../components/common/TimeControls';
 import Loader from '../components/common/Loader';
@@ -11,56 +13,57 @@ import Header from '../components/tokenInfo/Header';
 import Graph from '../components/tokenInfo/Graph';
 import Information from '../components/tokenInfo/Infomation';
 
+type TokenInfoProps = {
+    tokenId: string,
+    period: string, 
+    featchData: boolean, 
+    dataFeatched: Function
+}
 
-const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
-    const [tokenRate, setTokenRate] = useState([]);
-    const [tokenData, setTokenData] = useState([]);
-    const [currentTokenRate, setCurrentTokenRate] = useState(0);
-    const [percentage, setPercentage] = useState(0);
-    const [graphData, setGraphData] = useState([]);
-    const [gradient, setGradient] = useState([]);
-    const [tokenRateLoaded, setTokenRateLoaded] = useState(false);
-    const [tokenDataLoaded, setTokenDataLoaded] = useState(false);
+const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) => {
+    const [tokenRate, setTokenRate] = useState<Array<any>>([]);
+    const [tokenData, setTokenData] = useState<Array<any>>([]);
+    const [currentTokenRate, setCurrentTokenRate] = useState<number>(0);
+    const [percentage, setPercentage] = useState<number>(0);
+    const [graphData, setGraphData] = useState<Array<any>>([]);
+    const [gradient, setGradient] = useState<number>(0);
+    const [tokenRateLoaded, setTokenRateLoaded] = useState<boolean>(false);
+    const [tokenDataLoaded, setTokenDataLoaded] = useState<boolean>(false);
     const [error, setError] = useState(false);
 
     useEffect(() => {
         getTokenData();
+        getTokenRate();
     }, []);
 
     useEffect(() => {
         if (featchData) {
             dataFeatched();
             getTokenData();
+            getTokenRate();
         }
     });
 
-    getTokenData = async () => {
-        axios.get(`${rootUrl}/asset/id/${tokenId}`).then(res => {
+    const getTokenData = async () => {
+        const url = `${rootUrl}/asset/id/${tokenId}`;
+        axios.get(url).then(res => {
             setTokenData(res.data);
             setTokenDataLoaded(true);
         }).catch(err => {
             setError(true);
         });
+    }
 
-        axios.get(`${rootUrl}/asset/id/${tokenId}/rate?fiat=NZD&period=${period}&type=historic&has_history_only=true`).then(res => {
-            let graphData = [];
-            let max = 0;
-            let min = Infinity;
-            for (let i=0;i<res.data.history.length;i++) {
-                graphData.push(res.data.history[i].rate);
-                if (res.data.history[i].rate > max) {
-                    max = res.data.history[i].rate;
-                }
+    const getTokenRate = () => {
+        const url = `${rootUrl}/asset/id/${tokenId}/rate?fiat=NZD&period=${period}&type=historic&has_history_only=true`;
+        axios.get(url).then(res => {
+            const calculatedValues = calculateTokenGraphValues(res.data);
 
-                if (res.data.history[i].rate < min) {
-                    min = res.data.history[i].rate;
-                }
-            }
             setTokenRate(res.data);
-            setGraphData(graphData);
-            setCurrentTokenRate(res.data.history[0].rate - res.data.rate);
-            setPercentage((res.data.history[0].rate - res.data.rate) / res.data.rate * 100);
-            setGradient((100 - (min/max) * 100) + ((100 - (min/max) * 100) * 0.1));
+            setGraphData(calculatedValues.graphData);
+            setCurrentTokenRate(calculatedValues.currentTokenRate);
+            setPercentage(calculatedValues.percentage);
+            setGradient(calculatedValues.gradient);
             setTokenRateLoaded(true);
         }).catch(err => {
             setError(true);
@@ -73,18 +76,18 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
                 {(context) => (
                     <View>
                         <Header 
-                            darkTheme={context.state.darkTheme} 
+                            darkTheme={context.darkTheme} 
                             changePage={context.changePage} 
                             tokenData={tokenData} 
                             toggleTheme={context.toggleTheme}
                         />
                         <TimeControls 
                             updatePeriod={context.updatePeriod} 
-                            period={context.state.period} 
-                            darkTheme={context.state.darkTheme}
+                            period={context.period} 
+                            darkTheme={context.darkTheme}
                         />
                         <Graph 
-                            darkTheme={context.state.darkTheme} 
+                            darkTheme={context.darkTheme} 
                             tokenRate={tokenRate} 
                             currentTokenRate={currentTokenRate} 
                             graphData={graphData} 
@@ -92,7 +95,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
                             percentage={percentage}
                         />
                         <Information 
-                            darkTheme={context.state.darkTheme} 
+                            darkTheme={context.darkTheme} 
                             tokenData={tokenData} 
                             tokenRate={tokenRate}
                         />
@@ -106,3 +109,10 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}) => {
 }
 
 export default TokenInfo;
+
+TokenInfo.propTypes = {
+    tokenId: PropTypes.string.isRequired,
+    period: PropTypes.string.isRequired, 
+    featchData: PropTypes.bool.isRequired, 
+    dataFeatched: PropTypes.func.isRequired
+}

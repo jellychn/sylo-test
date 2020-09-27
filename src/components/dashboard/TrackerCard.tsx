@@ -4,16 +4,46 @@ import styles from './TrackerCard.styles';
 import axios from 'axios';
 import { LineChart } from 'react-native-svg-charts';
 import * as shape from 'd3-shape';
+import PropTypes from 'prop-types';
 
 import {rootUrl} from '../../utils/config';
+import {calculateTokenGraphValues} from '../../utils/common-functions';
 
-class TrackerCard extends React.Component {
-    constructor(props) {
+type TrackerCardProps = {
+    data: any,
+    period: string,
+    featchData: boolean,
+    dataFeatched: Function,
+    index: number,
+    darkTheme: boolean,
+    changePage: Function,
+}
+
+type TrackerCardState = {
+    tokenRate: any,
+    currentTokenRate: number,
+    percentage: number,
+    graphData: any,
+    error: boolean
+}
+
+class TrackerCard extends React.Component<TrackerCardProps, TrackerCardState> {
+    static propTypes = {
+        data: PropTypes.any.isRequired,
+        period: PropTypes.string.isRequired,
+        featchData: PropTypes.bool.isRequired,
+        dataFeatched: PropTypes.func.isRequired,
+        index: PropTypes.number.isRequired,
+        darkTheme: PropTypes.bool.isRequired,
+        changePage: PropTypes.func.isRequired
+    }
+    _isMounted: boolean;
+    constructor(props:any) {
         super(props);
         this.state = { 
             tokenRate: [],
             currentTokenRate: 0,
-            percentage: '',
+            percentage: 0,
             graphData: [],
             error: false
         };
@@ -34,19 +64,18 @@ class TrackerCard extends React.Component {
 
     componentWillUnmount() {
         this._isMounted = false;
-     }
+    }
 
     getTokenData = () => {
-        axios.get(`${rootUrl}/asset/id/${this.props.data.id}/rate?fiat=NZD&period=${this.props.period}&type=historic`).then(res => {
-            let graphData = [];
-            for (let i=0;i<res.data.history.length;i++) {
-                graphData.push(res.data.history[i].rate);
-            }
+        const url = `${rootUrl}/asset/id/${this.props.data.id}/rate?fiat=NZD&period=${this.props.period}&type=historic`;
+        axios.get(url).then(res => {
+            const calculatedValues = calculateTokenGraphValues(res.data);
+
             this._isMounted && this.setState({
                 tokenRate: res.data, 
-                graphData: graphData, 
-                currentTokenRate: res.data.history[0].rate - res.data.rate,
-                percentage: (res.data.history[0].rate - res.data.rate) / res.data.rate * 100
+                graphData: calculatedValues.graphData, 
+                currentTokenRate: calculatedValues.currentTokenRate,
+                percentage: calculatedValues.percentage
             });
         }).catch(err => {this.setState({error:true})});
     }
@@ -86,7 +115,6 @@ class TrackerCard extends React.Component {
                             strokeWidth: '3',
                             strokeLinejoin: 'round',
                             strokeLinecap: 'round',
-                            strokeLinejoin: 'round',
                             fill:"none"
                         }}>
                     </LineChart>

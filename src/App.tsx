@@ -12,13 +12,13 @@ const App = () => {
         <AppProvider>
             <AppContext.Consumer>
             {(context) => (
-            <View style={{backgroundColor: (context.state.darkTheme) ? '#000000' : '#FFFFFF', flex: 1}}>
-            {context.state.tokenInfoPage
+            <View style={{backgroundColor: (context.darkTheme) ? '#000000' : '#FFFFFF', flex: 1}}>
+            {context.tokenInfoPage
                 ? <TokenInfo
                 dataFeatched={context.dataFeatched}
-                period={context.state.period} 
-                featchData={context.state.featchData}
-                tokenId={context.state.tokenId}
+                period={context.period} 
+                featchData={context.featchData}
+                tokenId={context.tokenId}
                 />
                 : <Dashboard/>
             }

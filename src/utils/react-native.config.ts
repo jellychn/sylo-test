@@ -1,4 +1,4 @@
-module.exports = {
+export const module = {
     project: {
       ios: {},
       android: {}, // grouped into "project"

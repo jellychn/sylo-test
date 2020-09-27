@@ -22,7 +22,7 @@ const Dashboard = ({}) => {
         getTokens();
     }, []);
 
-    getTokens = async () => {
+    const getTokens = async () => {
         let url = '';
         if (q.length > 0) {
             url = `${rootUrl}/all?take=50&blockchain=ethereum&search=${q}&has_history_only=true`;
@@ -42,7 +42,7 @@ const Dashboard = ({}) => {
                 {(context) => (
                     <View style={styles.container}>
                         <Header 
-                            darkTheme={context.state.darkTheme} 
+                            darkTheme={context.darkTheme} 
                             toggleTheme={context.toggleTheme} 
                             q={q} 
                             search={search} 
@@ -50,17 +50,17 @@ const Dashboard = ({}) => {
                             getTokens={getTokens}
                             setSearch={setSearch}
                         />
-                        <TimeControls updatePeriod={context.updatePeriod} period={context.state.period} darkTheme={context.state.darkTheme}/>
-                        <ScrollView style={styles.body}>
+                        <TimeControls updatePeriod={context.updatePeriod} period={context.period} darkTheme={context.darkTheme}/>
+                        <ScrollView>
                             {tokens.map((data, index) => {
                                 return <TrackerCard 
                                     key={data.id} 
                                     index={index} 
                                     data={data} 
-                                    period={context.state.period}
-                                    featchData={context.state.featchData}
+                                    period={context.period}
+                                    featchData={context.featchData}
                                     dataFeatched={context.dataFeatched}
-                                    darkTheme={context.state.darkTheme} 
+                                    darkTheme={context.darkTheme} 
                                     changePage={context.changePage}
                                     />
                             })}

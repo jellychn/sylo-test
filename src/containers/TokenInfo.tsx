@@ -20,7 +20,7 @@ type TokenInfoProps = {
     dataFeatched: Function
 }
 
-const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) => {
+const TokenInfo = ({ tokenId, period, featchData, dataFeatched }: TokenInfoProps) => {
     const [tokenRate, setTokenRate] = useState<Array<any>>([]);
     const [tokenData, setTokenData] = useState<Array<any>>([]);
     const [currentTokenRate, setCurrentTokenRate] = useState<number>(0);
@@ -29,7 +29,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) 
     const [gradient, setGradient] = useState<number>(0);
     const [tokenRateLoaded, setTokenRateLoaded] = useState<boolean>(false);
     const [tokenDataLoaded, setTokenDataLoaded] = useState<boolean>(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         getTokenData();
@@ -45,7 +45,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) 
     });
 
     const getTokenData = async () => {
-        const url = `${rootUrl}/asset/id/${tokenId}`;
+        const url:string = `${ rootUrl }/asset/id/${ tokenId }`;
         axios.get(url).then(res => {
             setTokenData(res.data);
             setTokenDataLoaded(true);
@@ -55,7 +55,7 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) 
     }
 
     const getTokenRate = () => {
-        const url = `${rootUrl}/asset/id/${tokenId}/rate?fiat=NZD&period=${period}&type=historic&has_history_only=true`;
+        const url:string = `${ rootUrl }/asset/id/${tokenId}/rate?fiat=NZD&period=${period}&type=historic&has_history_only=true`;
         axios.get(url).then(res => {
             const calculatedValues = calculateTokenGraphValues(res.data);
 
@@ -76,28 +76,28 @@ const TokenInfo = ({tokenId, period, featchData, dataFeatched}: TokenInfoProps) 
                 {(context) => (
                     <View>
                         <Header 
-                            darkTheme={context.darkTheme} 
-                            changePage={context.changePage} 
-                            tokenData={tokenData} 
-                            toggleTheme={context.toggleTheme}
+                            darkTheme={ context.darkTheme } 
+                            changePage= {context.changePage } 
+                            tokenData={ tokenData } 
+                            toggleTheme={ context.toggleTheme }
                         />
                         <TimeControls 
-                            updatePeriod={context.updatePeriod} 
-                            period={context.period} 
-                            darkTheme={context.darkTheme}
+                            updatePeriod={ context.updatePeriod } 
+                            period={ context.period } 
+                            darkTheme={ context.darkTheme }
                         />
                         <Graph 
-                            darkTheme={context.darkTheme} 
-                            tokenRate={tokenRate} 
-                            currentTokenRate={currentTokenRate} 
-                            graphData={graphData} 
-                            gradient={gradient}
-                            percentage={percentage}
+                            darkTheme={ context.darkTheme } 
+                            tokenRate={ tokenRate } 
+                            currentTokenRate={ currentTokenRate } 
+                            graphData={ graphData } 
+                            gradient={ gradient }
+                            percentage={ percentage }
                         />
                         <Information 
-                            darkTheme={context.darkTheme} 
-                            tokenData={tokenData} 
-                            tokenRate={tokenRate}
+                            darkTheme={ context.darkTheme } 
+                            tokenData={ tokenData } 
+                            tokenRate={ tokenRate }
                         />
                     </View>
                 )}

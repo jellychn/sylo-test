@@ -11,7 +11,7 @@ type ContextProps = {
     updatePeriod: Function,
     dataFeatched: Function,
     changePage: Function
-  };
+};
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
 

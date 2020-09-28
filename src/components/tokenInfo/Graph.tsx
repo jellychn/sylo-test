@@ -15,7 +15,7 @@ type GraphProps = {
     percentage: number
 }
 
-const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, percentage}: GraphProps) => {
+const Graph = ({ darkTheme, tokenRate, currentTokenRate, graphData, gradient, percentage }: GraphProps) => {
     const Line = ({ line }: any) => (
         <Path
             key={'line'}
@@ -27,21 +27,21 @@ const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, per
         />
     )
     return (
-        <View style={[styles.graphContainer, {borderColor: (darkTheme) ? '#161616' : '#F6F6F6'}]}>
-            <View style={styles.tokenInfo}>
-                <Text style={[styles.rate, {color: (darkTheme) ? '#F6F6F6' : '#495162'}]}>
-                    {`$${Number(tokenRate.rate).toFixed(4)}`}
+        <View style={ [styles.graphContainer, {borderColor: (darkTheme) ? '#161616' : '#F6F6F6'}] }>
+            <View style={ styles.tokenInfo }>
+                <Text style={ [styles.rate, {color: (darkTheme) ? '#F6F6F6' : '#495162'}] }>
+                    { `$${Number(tokenRate.rate).toFixed(4)}` }
                 </Text>
-                <Text style={styles.percentage}>
-                    {`${Number(percentage).toFixed(2)}% ($${Number(currentTokenRate).toFixed(20).match(/^-?\d*\.?0*\d{0,2}/)[0]})`}
+                <Text style={ styles.percentage }>
+                    { `${Number(percentage).toFixed(2)}% ($${Number(currentTokenRate).toFixed(20).match(/^-?\d*\.?0*\d{0,2}/)[0]})` }
                 </Text>
             </View>
 
             <AreaChart
-                style={styles.graph}
+                style={ styles.graph }
                 data={ graphData }
                 contentInset={ { top: 0, bottom: 20 } }
-                curve={shape.curveNatural}
+                curve={ shape.curveNatural }
                 svg={{
                     stroke: '#F15A29',
                     strokeOpacity: '0.6',
@@ -51,8 +51,8 @@ const Graph = ({darkTheme, tokenRate, currentTokenRate, graphData, gradient, per
                     fill: "url(#gradient)",
                 }}>
 
-                <Defs key={'gradient'}>
-                    <LinearGradient id={'gradient'} x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse">
+                <Defs key={ 'gradient' }>
+                    <LinearGradient id={ 'gradient' } x1='0%' y1={gradient / 100} x2='0%' y2='0%' gradient-units="userSpaceOnUse">
                         <Stop offset="100%" stopColor="#F15A29" stopOpacity="0.2" />
                         {darkTheme
                         ? <Stop offset="0%" stopColor="#000000" stopOpacity="1" />

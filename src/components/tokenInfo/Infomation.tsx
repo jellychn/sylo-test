@@ -9,34 +9,34 @@ type InfomationProps = {
     tokenRate: any
 }
 
-const Infomation = ({darkTheme, tokenData, tokenRate}: InfomationProps) => {
+const Infomation = ({ darkTheme, tokenData, tokenRate }: InfomationProps) => {
     return (
-        <View style={styles.tokenContainer}>
-            <Text style={[styles.infomation, {color: (darkTheme) ? '#F6F6F6' : '#495162'}]}>
+        <View style={ styles.tokenContainer }>
+            <Text style={ [styles.infomation, {color: (darkTheme) ? '#F6F6F6' : '#495162'}] }>
                 Information
             </Text>
-            <View style={styles.informationDataWrapper}>
+            <View style={ styles.informationDataWrapper }>
                 <View>
-                    <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
+                    <Text style={ [styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}] }>
                         Symbol:
                     </Text>
-                    <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
+                    <Text style={ [styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}] }>
                         Market Cap:
                     </Text>
-                    <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
+                    <Text style={ [styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}] }>
                         24h Volume:
                     </Text>
                 </View>
 
                 <View>
-                    <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
-                        {tokenData.symbol}
+                    <Text style={ [styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}] }>
+                        { tokenData.symbol }
+                    </Text>
+                    <Text style={ [styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}] }>
+                        { `$${ Number(tokenRate.market_cap).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') } ${ tokenRate.fiat_symbol }` }
                     </Text>
                     <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
-                        {`$${Number(tokenRate.market_cap).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${tokenRate.fiat_symbol}`}
-                    </Text>
-                    <Text style={[styles.infomationData, {color: (darkTheme ? '#646464' : '#8A96AA')}]}>
-                        {`$${Number(tokenRate.volume_24h).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ${tokenRate.fiat_symbol}`}
+                        { `$${ Number(tokenRate.volume_24h).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') } ${ tokenRate.fiat_symbol }` }
                     </Text>
                 </View>
             </View>

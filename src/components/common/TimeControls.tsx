@@ -10,7 +10,7 @@ type TimeControlsProps = {
 }
 
 const TimeControls = ({darkTheme, period, updatePeriod}: TimeControlsProps) => {
-    const [times] = useState(['all', 'year', 'month', 'week','day']);
+    const [times] = useState<Array<string>>(['all', 'year', 'month', 'week','day']);
 
     const controls = times.map((time, index) => {
         if (darkTheme) {
@@ -20,7 +20,7 @@ const TimeControls = ({darkTheme, period, updatePeriod}: TimeControlsProps) => {
         }
     });
 
-    return <View style={styles.timeControlsContainer}>{ controls }</View>
+    return <View style={ styles.timeControlsContainer }>{ controls }</View>
 }
 
 export default TimeControls;

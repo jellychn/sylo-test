@@ -7,11 +7,13 @@ import { AppContext } from '../../providers/AppProvider';
 const Loader = () => {
     return (
         <AppContext.Consumer>
-            {(context) => (
-                <View style={styles.container}>
-                    <Text style={[styles.loader, {color: context.darkTheme ? '#F15A29':'#8A96AA'}]}>LOADING</Text>
-                </View>
-            )}
+            {(context) => {
+                return (
+                    <View style={styles.container}>
+                        <Text style={[styles.loader, { color: context.darkTheme ? '#F15A29' : '#8A96AA' }]}>LOADING</Text>
+                    </View>
+                );
+            }}
         </AppContext.Consumer>
     )
 };
